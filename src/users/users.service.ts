@@ -29,4 +29,12 @@ export class UsersService {
     }
     return userData;
   }
+
+  findAllByEmail(email: string): Promise<User[]> {
+    return this.userRepo.find({
+      where: {
+        email,
+      },
+    });
+  }
 }

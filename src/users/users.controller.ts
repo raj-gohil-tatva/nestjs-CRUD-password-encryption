@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { SignupUserDTO } from './DTO/users.dto';
 import { UsersService } from './users.service';
 
@@ -17,5 +25,11 @@ export class UsersController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.userService.findById(Number(id));
+  }
+
+  // Get the user list from the provided email.
+  @Get()
+  findAllByEmail(@Query('email') email: string) {
+    return this.userService.findAllByEmail(email);
   }
 }
