@@ -38,7 +38,19 @@ export class UsersService {
     });
   }
 
-  async findAndRemoveById(id: number) {
+  async updateUserById(id: number, body: Partial<User>) {
+    // Find the id whether exist or not.
+    const userData = await this.findById(id);
+    Object.assign(userData, body);
+    // Update the data.
+    /**
+     * Update can also worked by using the below method.
+     * return this.userRepo.update({ id }, body);
+     */
+    return this.userRepo.save(userData);
+  }
+
+  async findAndRemoveById(id: number): Promise<User> {
     // Find the id whether exist or not.
     const userData = await this.findById(id);
     /**
