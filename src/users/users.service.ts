@@ -23,6 +23,7 @@ export class UsersService {
       where: {
         id,
       },
+      select: ['password'],
     });
     if (!userData) {
       throw new NotFoundException('Sorry, This user does not exist.');

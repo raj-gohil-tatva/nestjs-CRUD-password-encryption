@@ -5,6 +5,7 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
+  Exclusion,
 } from 'typeorm';
 
 @Entity()
@@ -15,7 +16,7 @@ export class User {
   @Column()
   email: string;
 
-  @Column()
+  @Column({ select: false })
   password: string;
 
   // Have implemented the hooks below to log the create, Update and delete operations.
