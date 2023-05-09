@@ -32,4 +32,10 @@ export class UsersController {
   findAllByEmail(@Query('email') email: string) {
     return this.userService.findAllByEmail(email);
   }
+
+  // Remove the user by id.
+  @Delete(':id')
+  removeById(@Param('id') id: string) {
+    return this.userService.findAndRemoveById(Number(id));
+  }
 }

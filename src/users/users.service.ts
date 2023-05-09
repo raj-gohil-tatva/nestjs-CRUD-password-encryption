@@ -37,4 +37,15 @@ export class UsersService {
       },
     });
   }
+
+  async findAndRemoveById(id: number) {
+    // Find the id whether exist or not.
+    const userData = await this.findById(id);
+    /**
+     * You can delete the user by this as well
+     * return this.userRepo.delete(id);
+     * But returning the delete method will not invoke the afterRemove hook.
+     */
+    return this.userRepo.remove(userData);
+  }
 }
