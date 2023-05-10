@@ -1,3 +1,4 @@
+import { encryptPassword } from 'src/utilities/helper';
 import {
   AfterInsert,
   AfterUpdate,
@@ -5,7 +6,7 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  Exclusion,
+  BeforeInsert,
 } from 'typeorm';
 
 @Entity()
@@ -13,7 +14,7 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   email: string;
 
   @Column({ select: false })
@@ -35,5 +36,12 @@ export class User {
   @AfterRemove()
   logAfterRemove() {
     console.log(`Deleted the user record of id: ${this.id}`);
+  }
+
+  // Encrypting the user password.
+  @BeforeInsert()
+  async encryptPassword() {
+    console.log('Encrypting the user password...');
+    this.password = await encryptPassword(this.password);
   }
 }

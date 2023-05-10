@@ -16,10 +16,16 @@ export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
   // Create the user.
-  @Post('/signup')
+  @Post('signup')
   createUser(@Body() body: SignupUserDTO) {
     const { email, password } = body;
     return this.userService.createUser(email, password);
+  }
+
+  // Login the user.
+  @Post('login')
+  Login(@Body('email') email: string, @Body('password') password: string) {
+    return this.userService.login(email, password);
   }
 
   // Get the User.

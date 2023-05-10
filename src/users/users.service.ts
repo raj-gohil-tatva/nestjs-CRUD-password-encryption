@@ -1,7 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './users.entity';
 import { Repository } from 'typeorm';
+import { compareHashedPassword } from 'src/utilities/helper';
 
 @Injectable()
 export class UsersService {
@@ -9,13 +14,59 @@ export class UsersService {
     @InjectRepository(User) private readonly userRepo: Repository<User>,
   ) {}
 
-  createUser(email: string, password: string) {
+  async createUser(email: string, password: string) {
+    // Find the email already exist or not.
+    const findEmail = await this.userRepo.findOne({
+      where: {
+        email,
+      },
+      select: ['id'],
+    });
+    if (findEmail) {
+      throw new BadRequestException(
+        `Sorry, ${email} already exist in the system.`,
+      );
+    }
     /**
      * Similarly You can do something like this to create the new use in the one simple step.
      * return this.userRepo.insert({ password, email });
      */
     const userData = this.userRepo.create({ password, email });
-    return this.userRepo.save(userData);
+    const userDataSave = await this.userRepo.save(userData);
+    delete userDataSave.password;
+    return userData;
+  }
+
+  async login(email: string, password: string) {
+    // find by the email.
+    const user = await this.userRepo.findOne({
+      where: {
+        email,
+      },
+      select: ['id', 'email', 'password'],
+    });
+    // Throw error if the user does not exist in the provided email.
+    if (!user) {
+      throw new NotFoundException(
+        `Sorry, No email match has been for the ${email} record.`,
+      );
+    }
+    // Match the password.
+    const isPasswordMatched = await compareHashedPassword(
+      password,
+      user.password,
+    );
+    if (!isPasswordMatched) {
+      throw new BadRequestException(
+        `Provided password was invalid, Please provide the valid password.`,
+      );
+    }
+    // Delete the password property and assign the login message.
+    delete user.password;
+    Object.assign(user, {
+      message: 'User has been login successfully!',
+    });
+    return user;
   }
 
   async findById(id: number): Promise<User> {
@@ -23,7 +74,6 @@ export class UsersService {
       where: {
         id,
       },
-      select: ['password'],
     });
     if (!userData) {
       throw new NotFoundException('Sorry, This user does not exist.');
